@@ -70,13 +70,17 @@ WITH (
 
 select *from sales
 
+select *from product
+
+select *from customer
+
+
 INSERT INTO dbo.customer([user_name],first_name, last_name, country, town, address, active)
 VALUES('jvn_dhl','Jeevan','Dahal','Nepal','','','Y'),
 ('prm_gtm','Pramod','Gautam','Nepal','','','Y'),
 ('jwn_nrl','Jiwan','Niroula','Nepal','','','Y'),
 ('rzn_rai','Raazan','Rai','Nepal','','','Y'),
 ('tej_prj','Tej','Parajuli','Nepal','','','Y');
-
 
 INSERT INTO dbo.product(product_name, description, price, mrp, pieces_per_cASE, weight_per_piece, uom, brand, category, tax_percent, active, created_by, created_date, updated_by, updated_date)
 VALUES
@@ -633,118 +637,3 @@ VALUES
 ('SS HC SMnMng 320X24 Rs2570', 'SS HC SMnMng 320X24 Rs2570', 193.158, 270, 24, 320, 'CD', 'SunShine', 'Hair Care', 13, 'Y', 'manis', '2017-08-08 00:00:00', 'manis', '2017-08-08 00:00:00'),
 ('SS HC SMnMng 320X24 Rs270', 'SS HC SMnMng 320X24 Rs270', 193.158, 270, 24, 320, 'CD', 'SunShine', 'Hair Care', 13, 'Y', 'manis', '2017-08-08 00:00:00', 'manis', '2017-08-08 00:00:00'),
 ('SS HC HFS 7_5X384', 'SS HC HFS 7_5X384', 2.18596, 3, 384, 7.5, 'CD', 'SunShine', 'Hair Care', 13, 'Y', 'manis', '2017-08-08 00:00:00', 'manis', '2017-08-08 00:00:00');
-
-
---Select all products with brand “Cacti Plus”
-select * from product
-where brand='Cacti Plus'
-
-
---Count of total products with product category=”Skin Care”
-
-select COUNT (*) from product
-where category ='Skin Care'
-
---Count of total products with MRP more than 100
-
-select COUNT (*) from product
-where mrp >100
-
---Count of total products with product category=”Skin Care” and MRP more than 100
-
-select COUNT (*) from product
-where category= 'Skin Care' and mrp > 100
-
---Brandwise product count
-
-select product.brand, count (product.product_id) from product	
-group by brand
-
---Brandwise as well as Active/Inactive Status wise product count
-
-select product.brand,
-	sum(case when active = 'Y' then 1 else 0 end) as active,
-	sum(case when active = 'N' then 1 else 0 end) as inactive,
-	COUNT(*) AS totals
-from product
-group by brand
-
-
---Display all columns with Product category in Skin Care or Hair Care
-
-select * from product
-where category = 'Skin Care' or category = 'Hair Care'
-
---Display   all   columns   with   Product   category=”Skin   Care”   and Brand=”Pondy”, and MRP more than 100
-
-select * from product
-where mrp>100 and (category='Skin Care' and brand='Pondy');
-
---Display   all   columns   with   Product   category   ="Skin   Care"   or Brand=”Pondy”, and MRP more than 100
-
-select * from product
-where mrp>100 and (category='Skin Care' or brand='Pondy');
-
---Display all product names only with names starting from letter P
-
-select * from product
-where product_name like 'P%'
-
---Display  all product  names only with names Having letters “Bar”  in Between
-
-select * from product
-where product_name like '%Bar%'
-
-
-select * from sales
-
-
---Sales of those products which have been sold in more than two quantity in a bill
-select * from sales
-where qty > 2
-
---Sales of those products which have been sold in more than two quantity throughout the bill
-select product_id, SUM(qty) quantity from sales 
-group by product_id having SUM(qty) > 2
-
-
-/*
-Create a new table with columns username and birthday, and dump data from dates file. Convert it to .csv format if required.
-After populating the data, find no of people sharing
-Birth date
-Birth month
-Weekday
-Find the current age of all people
-*/
-
-create table birthday(
-    name varchar(30),
-	birthdate date
-)
-
-bulk insert dbo.people
-from 'D:\01. Desktop\LeapFrog\sql_learn\dates.csv'
-with (
-  firstrow = 2,
-  fieldterminator = ',',
-  rowterminator = '\n'
-  )
-
---no of people sharing Birth date
-
-select COUNT(name) from birthday
-where birthdate IN (
-  select birthdate FROM birthday
-  group by birthdate
-  having COUNT(birthdate) > 1
-)
-
-select birthdate,
-       MONTH(birthdate) birthmonth
-from birthday
-
-select COUNT(name) ,
-    DATENAME(weekday, GETDATE()) as WEEKDAY
-from birthday
-select *, DATEDIFF(year, birthdate, GETDATE()) Age
-from birthday
